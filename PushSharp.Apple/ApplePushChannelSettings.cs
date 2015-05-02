@@ -212,5 +212,7 @@ namespace PushSharp.Apple
         /// Gets or sets the keep alive retry period to set on the APNS socket
         /// </summary>
 	    public TimeSpan KeepAliveRetryPeriod { get; set; }
+
+        public string ApplicationId { get; set; }
 	}
 }

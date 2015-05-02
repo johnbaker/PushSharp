@@ -8,11 +8,14 @@ using System.Net.Sockets;
 using System.Net.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using PushSharp.Core;
 
 namespace PushSharp.Apple
 {
 	public class FeedbackService
 	{
+        public ApplePushChannelSettings ChannelSettings { get; private set; }
+
 		public delegate void FeedbackReceivedDelegate (string deviceToken, DateTime timestamp);
 
 		public event FeedbackReceivedDelegate OnFeedbackReceived;
@@ -39,7 +42,7 @@ namespace PushSharp.Apple
 		{
 			try
 			{
-				Run(settings, (new CancellationTokenSource()).Token);
+                Run(settings, (new CancellationTokenSource()).Token);
 			}
 			catch (Exception ex)
 			{
@@ -49,7 +52,9 @@ namespace PushSharp.Apple
 
 		public void Run(ApplePushChannelSettings settings, CancellationToken cancelToken)
 		{
-			var encoding = Encoding.ASCII;
+            ChannelSettings = settings;
+
+            var encoding = Encoding.ASCII;
 
 			var certificate = settings.Certificate;
 
@@ -77,11 +82,15 @@ namespace PushSharp.Apple
 			//Get the first feedback
 			recd = stream.Read(buffer, 0, buffer.Length);
 
-			//Continue while we have results and are not disposing
-			while (recd > 0 && !cancelToken.IsCancellationRequested)
+            Log.Info("{0} -> Reading for {1}", this, ChannelSettings.ApplicationId);
+
+            //Continue while we have results and are not disposing
+            while (recd > 0 && !cancelToken.IsCancellationRequested)
 			{
-				//Update how much data is in the buffer, and reset the position to the beginning
-				bufferLevel += recd;
+                Log.Info("{0} -> found some data for {1}!", this, ChannelSettings.ApplicationId);
+
+                //Update how much data is in the buffer, and reset the position to the beginning
+                bufferLevel += recd;
 				bufferIndex = 0;
 
 				try
@@ -122,14 +131,19 @@ namespace PushSharp.Apple
 							{
 								RaiseFeedbackReceived(deviceToken, timestamp);
 							}
-							catch { }
-						}
+                            catch (Exception ex)
+                            {
+                                Log.Info("{0}", ex);
+                            }
+                        }
 
 						//Keep track of where we are in the received data buffer
 						bufferIndex += completePacketSize;
 					}
 				}
-				catch { }
+				catch (Exception ex) { 
+                    Log.Info("{0}", ex);
+                }
 
 				//Figure out how much data we have left over in the buffer still
 				bufferLevel -= bufferIndex;

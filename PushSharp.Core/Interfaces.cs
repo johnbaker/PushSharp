@@ -46,6 +46,7 @@ namespace PushSharp.Core
 
 	public interface IPushServiceSettings
 	{
+        string ApplicationId { get; set; }
 		bool AutoScaleChannels { get; set; }
 		int MaxAutoScaleChannels { get; set; }
 		long MinAvgTimeToScaleChannels { get; set; }

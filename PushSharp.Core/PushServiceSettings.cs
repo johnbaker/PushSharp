@@ -18,6 +18,7 @@ namespace PushSharp.Core
 			this.IdleTimeout = TimeSpan.FromMinutes (5);
 		}
 
+        public string ApplicationId { get; set; }
 		public bool AutoScaleChannels { get; set; }
 		public int MaxAutoScaleChannels { get; set; }
 		public long MinAvgTimeToScaleChannels { get; set; }

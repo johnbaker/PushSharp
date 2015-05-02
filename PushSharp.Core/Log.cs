@@ -13,7 +13,7 @@ namespace PushSharp.Core
 		{
 			Logger = null;
 		}
-		public static LogLevel Level = LogLevel.None;
+		public static LogLevel Level = LogLevel.Info;
 
 		public static void Debug(string format, params object[] objs)
 		{
